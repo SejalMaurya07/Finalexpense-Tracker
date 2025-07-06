@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { BASE_URL } from "../config"; // ✅ use BASE_URL from config
 
 function BudgetForm({ onSave, editing, selectedMonth, onClearEditing }) {
   const [amount, setAmount] = useState("");
@@ -20,7 +21,7 @@ function BudgetForm({ onSave, editing, selectedMonth, onClearEditing }) {
   useEffect(() => {
     const fetchBudgets = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/budgets");
+        const res = await axios.get(`${BASE_URL}/api/budgets`);
         setBudgets(res.data);
       } catch (err) {
         console.error("Failed to load budgets", err);
@@ -65,7 +66,7 @@ function BudgetForm({ onSave, editing, selectedMonth, onClearEditing }) {
 
     try {
       if (editing) {
-        await axios.put(`http://localhost:5000/api/budgets/${editing._id}`, payload);
+        await axios.put(`${BASE_URL}/api/budgets/${editing._id}`, payload);
         onClearEditing();  // ✅ Exit editing mode
       } else {
         const alreadyExists = budgets.some(
@@ -79,7 +80,7 @@ function BudgetForm({ onSave, editing, selectedMonth, onClearEditing }) {
           return;
         }
 
-        await axios.post("http://localhost:5000/api/budgets", payload);
+        await axios.post(`${BASE_URL}/api/budgets`, payload);
       }
 
       onSave();     // reload updated list

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Plus, Pencil } from "lucide-react";
+import { BASE_URL } from "../config";
 
-function TransactionForm({ onAdd, editing }) {
+function TransactionForm({ onAdd, editing, setEditing }) {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
@@ -10,14 +12,14 @@ function TransactionForm({ onAdd, editing }) {
 
   useEffect(() => {
     if (editing) {
-      setAmount(editing.amount);
+      setAmount(editing.amount.toString());
       setDate(editing.date);
       setDescription(editing.description);
       setCategory(editing.category);
     }
   }, [editing]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!amount || !date || !description || !category) {
@@ -25,21 +27,27 @@ function TransactionForm({ onAdd, editing }) {
       return;
     }
 
-    const newTransaction = {
-      ...(editing ? { _id: editing._id } : {}),
+    const transaction = {
       amount: parseFloat(amount),
       date,
-      description,
-      category,
+      description: description.trim(),
+      category: category.trim(),
+      _id: editing?._id, // needed for update
     };
 
-    onAdd(newTransaction);
-
-    setAmount("");
-    setDate("");
-    setDescription("");
-    setCategory("");
-    setError("");
+    try {
+      await onAdd(transaction); // call parent handler (App.jsx)
+      // Clear form
+      setAmount("");
+      setDate("");
+      setDescription("");
+      setCategory("");
+      setError("");
+      setEditing?.(null);
+    } catch (err) {
+      console.error("❌ Submission failed:", err);
+      setError("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -74,7 +82,11 @@ function TransactionForm({ onAdd, editing }) {
           onChange={(e) => setDescription(e.target.value)}
           className="input"
         />
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="input">
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="input"
+        >
           <option value="">Select Category</option>
           <option value="Food">🍔 Food</option>
           <option value="Utilities">💡 Utilities</option>
@@ -84,15 +96,34 @@ function TransactionForm({ onAdd, editing }) {
         </select>
       </div>
 
-      <button
-        type="submit"
-        className={`w-full flex justify-center items-center gap-2 ${
-          editing ? "bg-yellow-500" : "bg-blue-600"
-        } hover:opacity-90 text-white py-2 px-4 rounded-lg font-medium`}
-      >
-        {editing ? <Pencil size={18} /> : <Plus size={18} />}
-        {editing ? "Update Transaction" : "Add Transaction"}
-      </button>
+      <div className="flex gap-4 items-center">
+        <button
+          type="submit"
+          className={`w-full flex justify-center items-center gap-2 ${
+            editing ? "bg-yellow-500" : "bg-blue-600"
+          } hover:opacity-90 text-white py-2 px-4 rounded-lg font-medium`}
+        >
+          {editing ? <Pencil size={18} /> : <Plus size={18} />}
+          {editing ? "Update Transaction" : "Add Transaction"}
+        </button>
+
+        {editing && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditing(null);
+              setAmount("");
+              setDate("");
+              setDescription("");
+              setCategory("");
+              setError("");
+            }}
+            className="text-sm text-gray-600 hover:underline"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 }
