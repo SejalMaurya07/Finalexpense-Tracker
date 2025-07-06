@@ -16,7 +16,7 @@ Deployment: Frontend on Vercel, Backend on Render
 
  How to Run Locally
 ### 1. Clone the Repo
-git clone 
+git clone https://github.com/SejalMaurya07/Finalexpense-Tracker.git
 cd your-repo-name
 ### 2. Frontend Setup
 cd frontend
