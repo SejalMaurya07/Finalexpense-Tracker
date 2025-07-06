@@ -29,5 +29,5 @@ Deployment: Frontend on Vercel, Backend on Render
 
 ### Live Demo
 
-## Frontend: https://your-vercel-app.vercel.app
-## Backend: https://your-render-api.onrender.com
+## Frontend: https://expensetrackeapi.vercel.app/
+## Backend: https://finalexpense-tracker.onrender.com
